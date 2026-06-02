@@ -1,4 +1,5 @@
 import grpc
+import time
 
 from rpc.gen import ai_service_pb2
 from rpc.gen import ai_service_pb2_grpc
@@ -21,12 +22,18 @@ def main() -> None:
     print()
     print("stream:")
 
+    start = time.time()
     stream = client.StreamChat(request, timeout=60)
+
+    idx = 0
     for item in stream:
+        idx += 1
+        now = time.time() - start
         if item.delta:
-            print(item.delta, end="", flush=True)
+            print(f"\n[chunk {idx} at {now:.2f}s]")
+            print(repr(item.delta))
         if item.done:
-            print("\n\n[stream done]")
+            print("\n[stream done]")
 
 
 if __name__ == "__main__":

@@ -5,6 +5,23 @@ from models.chat_model import ChatModelFactory
 from prompts.system_prompt import SYSTEM_PROMPT
 from schemas.chat import ChatMessage
 
+
+def _normalize_content(content) -> str:
+    if isinstance(content, str):
+        return content
+
+    if isinstance(content, list):
+        parts: list[str] = []
+        for item in content:
+            if isinstance(item, str):
+                parts.append(item)
+            elif isinstance(item, dict) and item.get("type") == "text":
+                parts.append(item.get("text", ""))
+        return "".join(parts)
+
+    return str(content)
+
+
 """ 简单智能体 """
 class SimpleAgent:
     def __init__(self, settings: Settings | None = None) -> None:
@@ -32,13 +49,13 @@ class SimpleAgent:
         llm = self.model_factory.main_model(streaming=False)
         message = self._build_messages(query, history)
         result = llm.invoke(message)
-        return str(result.content)
+        return _normalize_content(result.content)
 
     """ 流式聊天 """
     def stream_chat(self, query: str, history: list[ChatMessage]):
         llm = self.model_factory.main_model(streaming=True)
         message = self._build_messages(query, history)
         for chunk in llm.stream(message):
-            content = getattr(chunk, "content", "")
+            content = _normalize_content(getattr(chunk, "content", ""))
             if content:
                 yield content
