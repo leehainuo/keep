@@ -1,7 +1,7 @@
 from typing import Any, TypedDict
 
 from langchain.agents import create_agent
-from langchain_core.messages import AIMessage, AIMessageChunk, BaseMessage, HumanMessage
+from langchain_core.messages import AIMessage, BaseMessage, HumanMessage
 from langgraph.graph import END, START, StateGraph
 
 from config.settings import Settings, get_settings
@@ -50,6 +50,11 @@ class ReActAgent:
 
         self.react_agent = create_agent(
             model=self.model_factory.main_model(streaming=False),
+            tools=self.tools,
+            system_prompt=SYSTEM_PROMPT,
+        )
+        self.streaming_react_agent = create_agent(
+            model=self.model_factory.main_model(streaming=True),
             tools=self.tools,
             system_prompt=SYSTEM_PROMPT,
         )
@@ -195,12 +200,13 @@ class ReActAgent:
         messages = self._convert_history(history)
         messages.append(HumanMessage(content=prepared_query))
 
-        for chunk, _metadata in self.react_agent.stream(
+        for chunk, _metadata in self.streaming_react_agent.stream(
             {"messages": messages},
             stream_mode="messages",
         ):
-            if not isinstance(chunk, AIMessageChunk):
+            raw_content = getattr(chunk, "content", None)
+            if raw_content is None:
                 continue
-            content = _normalize_content(chunk.content)
+            content = _normalize_content(raw_content)
             if content:
                 yield content
