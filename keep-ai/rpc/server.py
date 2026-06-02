@@ -3,9 +3,9 @@ from concurrent import futures
 
 import grpc
 
-import ai_service_pb2_grpc
 from config.settings import get_settings
-from grpc.handlers import AIServiceHandler
+from rpc.gen import ai_service_pb2_grpc
+from rpc.handlers import AIServiceHandler
 
 
 def serve() -> None:

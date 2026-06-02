@@ -3,7 +3,7 @@
 import grpc
 import warnings
 
-import ai_service_pb2 as ai__service__pb2
+from . import ai_service_pb2 as ai__service__pb2
 
 GRPC_GENERATED_VERSION = '1.81.0'
 GRPC_VERSION = grpc.__version__
@@ -81,7 +81,7 @@ def add_AIServiceServicer_to_server(servicer, server):
     server.add_registered_method_handlers('ai.v1.AIService', rpc_method_handlers)
 
 
- # This class is part of an EXPERIMENTAL API.
+# This class is part of an EXPERIMENTAL API.
 class AIService:
     """Missing associated documentation comment in .proto file."""
 

@@ -1,8 +1,8 @@
 import grpc
 
-import ai_service_pb2
-import ai_service_pb2_grpc
 from agent.react_agent import ReActAgent
+from rpc.gen import ai_service_pb2
+from rpc.gen import ai_service_pb2_grpc
 from schemas.chat import ChatMessage
 
 """ gRPC 服务处理器 """
@@ -14,7 +14,7 @@ class AIServiceHandler(ai_service_pb2_grpc.AIServiceServicer):
 
 
     """ 处理聊天请求 """
-    def Chat(self, request, context: grpc.ServerContext):
+    def Chat(self, request, context: grpc.ServicerContext):
         history = [
             ChatMessage(role=item.role, content=item.content)
             for item in request.history
@@ -41,7 +41,7 @@ class AIServiceHandler(ai_service_pb2_grpc.AIServiceServicer):
         )
 
     """ 处理流式聊天请求 """
-    def StreamChat(self, request, context: grpc.ServerContext):
+    def StreamChat(self, request, context: grpc.ServicerContext):
         history = [
             ChatMessage(role=item.role, content=item.content)
             for item in request.history
