@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+package ai.v1;
+
+option go_package = "keep-api/internal/grpc/pb;aipb";
+
+message Message {
+  string role = 1;
+  string content = 2;
+}
+
+message ChatRequest {
+  string session_id = 1;
+  string user_id = 2;
+  string query = 3;
+  repeated Message history = 4;
+  bool use_rag = 5;
+}
+
+message Reference {
+  string id = 1;
+  string title = 2;
+  string category = 3;
+  string snippet = 4;
+  float score = 5;
+}
+
+message ChatResponse {
+  string answer = 1;
+  repeated Reference references = 2;
+}
+
+message StreamChatResponse {
+  string delta = 1;
+  bool done = 2;
+}
+
+service AIService {
+  rpc Chat(ChatRequest) returns (ChatResponse);
+  rpc StreamChat(ChatRequest) returns (stream StreamChatResponse);
+}
