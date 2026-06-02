@@ -23,14 +23,14 @@ def build_tools(retriever: KnowledgeRetriever, settings: Settings | None = None)
     settings = settings or get_settings()
     es = get_elasticsearch_client()
 
-    """获取当前服务器时间。"""
     @tool
     def get_current_time() -> str:
+        """获取当前服务器时间。"""
         return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-    """在知识库中检索和当前问题相关的内容。"""
     @tool
     def search_knowledge(query: str) -> str:
+        """在知识库中检索和当前问题相关的内容。"""
         docs = retriever.search(query, top_k=settings.search_top_k)
         if not docs:
             return "知识库中没有检索到相关内容。"
@@ -42,9 +42,9 @@ def build_tools(retriever: KnowledgeRetriever, settings: Settings | None = None)
             )
         return "\n\n".join(lines)
 
-    """查询 Prometheus 指标，参数为 PromQL 表达式。""""""查询 Prometheus 指标，参数为 PromQL 表达式。"""
     @tool
     def query_metrics(expr: str) -> str:
+        """查询 Prometheus 指标，参数为 PromQL 表达式。"""
         url = f"{settings.prometheus_url.rstrip('/')}/api/v1/query"
         resp = httpx.get(url, params={"query": expr}, timeout=20.0)
         resp.raise_for_status()
@@ -64,9 +64,9 @@ def build_tools(retriever: KnowledgeRetriever, settings: Settings | None = None)
             lines.append(f"metric={metric}, value={value}")
         return "\n".join(lines)
 
-    """查询 Elasticsearch 日志，参数为关键词。"""
     @tool
     def query_logs(keyword: str) -> str:
+        """查询 Elasticsearch 日志，参数为关键词。"""
         body = {
             "size": 10,
             "sort": [{"@timestamp": {"order": "desc"}}],
@@ -96,9 +96,9 @@ def build_tools(retriever: KnowledgeRetriever, settings: Settings | None = None)
             )
         return "\n".join(lines)
 
-    """查询 Jaeger 链路，参数为服务名。"""
     @tool
     def query_traces(service_name: str) -> str:
+        """查询 Jaeger 链路，参数为服务名。"""
         url = f"{settings.jaeger_url.rstrip('/')}/api/traces"
         resp = httpx.get(url, params={"service": service_name, "limit": 5}, timeout=20.0)
         resp.raise_for_status()
