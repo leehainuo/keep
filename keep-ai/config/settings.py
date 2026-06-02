@@ -31,6 +31,9 @@ class Settings(BaseSettings):
     )
 
     """ LLM 配置 """
+    llm_api_key: str = Field(
+        validation_alias=AliasChoices("LLM_API_KEY"),
+    )
     llm_base_url: str = Field(
         default="https://dashscope.aliyuncs.com/compatible-mode/v1",
         validation_alias=AliasChoices("LLM_BASE_URL"),
